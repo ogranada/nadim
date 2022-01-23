@@ -7,7 +7,12 @@ docker build . --tag nadim:1.0.0
 ```
 
 # How to use the image
+You can use the command line
+```bash
+./run.sh usage
+```
 
+Or use raw docker:
 ```bash
 export INTERNAL_PORT=5000
 export LOCAL_PORT=5050

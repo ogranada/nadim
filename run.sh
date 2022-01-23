@@ -15,6 +15,7 @@ function main() {
   APP=$1
   CMD=$2
   CONTAINER_NAME='naim_local'
+  DH_USERNAME='ogranada'
   case $CMD in
     usage)
         echo ""
@@ -29,7 +30,16 @@ function main() {
         echo ""
         echo ""
         ;;
+    push)
+        echo "Pushing image to docker registry"
+        docker image push --all-tags $DH_USERNAME/nadim
+        ;;
     build)
+        read -e -p "VERSION: " VERSION
+        history -s "$VERSION"
+        docker build . --tag $DH_USERNAME/nadim:$VERSION
+        docker build . --tag $DH_USERNAME/nadim:latest
+        docker build . --tag nadim:$VERSION
         docker build . --tag nadim:latest
         ;;
     create)

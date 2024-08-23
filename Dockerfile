@@ -1,4 +1,4 @@
-FROM node:14-alpine
+FROM node:18-alpine
 WORKDIR /workspace
 RUN apk update && apk upgrade && \
     apk add --no-cache bash git openssh

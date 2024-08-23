@@ -9,25 +9,28 @@ echo "NAIM - Node App IMage"
 echo "RUNNING AS: $(whoami)"
 echo "CURRENT FOLDER: $(pwd)"
 
-if [ -z "$REPO" ]; then
-  echo "Repo not found..."
-else
-  echo "Preparing Repo $REPO..."
-  if [ -d "app" ]; then
-    cd app
-    git pull origin $(current)
-    BUILD=$(npm run | grep build)
-    if [ -z "$BUILD" ]; then
-      npm run build
-    fi
-    cd ..
-  else
-    git clone $REPO app
-  fi
-  cd app
+function prepare_project() {
+  echo "Preparing project at $(pwd)"
   npm install
+  BUILD=$(npm run | grep build)
+  if [ -z "$BUILD" ]; then
+    echo "  - Nothing to build..."
+  else
+    npm run build
+  fi
+  echo "Project ready..."
+}
+
+function run_project() {
+  cd app
   if [ -z "$MAINFILE" ]; then
-    npm start
+    START=$(npm run | grep build)
+    if [ -z "$START" ]; then
+      echo "No main file or start script found"
+      exit 1;
+    else
+      npm start
+    fi
   else
     if [ "$LAUNCHER" = "pm2" ]; then
         pm2 start "./$MAINFILE"
@@ -39,4 +42,23 @@ else
       fi
     fi
   fi
+  cd ..
+}
+
+if [ -z "$REPO" ]; then
+  echo "Repo not found..."
+else
+  echo "Preparing Repo $REPO..."
+  if [ -d "app" ]; then
+    cd app
+    prepare_project
+    cd ..
+  else
+    git clone $REPO app
+    cd app
+    prepare_project
+    cd ..
+  fi
+  echo "Preparing execution..."
+  run_project
 fi

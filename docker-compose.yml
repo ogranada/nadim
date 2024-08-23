@@ -1,0 +1,13 @@
+services:
+    app:
+        container_name: app
+        image: ogranada/nadim
+        restart: always
+        stdin_open: true
+        tty: true
+        environment:
+            REPO: "https://github.com/ogranada-mentoring/dummy-be"
+            MAINFILE: "src/server.js"
+            PORT: "5051"
+        ports:
+            - "6060:5051" ## local:remote

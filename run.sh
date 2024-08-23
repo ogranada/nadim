@@ -1,5 +1,7 @@
 #!/bin/bash
 
+command -v docker > /dev/null && RUNNER=docker || RUNNER=PODMAN
+
 function confirm() {
   read -p "$@ " -n 1 -r
   echo    # (optional) move to a new line
@@ -32,15 +34,15 @@ function main() {
         ;;
     push)
         echo "Pushing image to docker registry"
-        docker image push --all-tags $DH_USERNAME/nadim
+        ${RUNNER} image push --all-tags $DH_USERNAME/nadim
         ;;
     build)
         read -e -p "VERSION: " VERSION
         history -s "$VERSION"
-        docker build . --tag $DH_USERNAME/nadim:$VERSION
-        docker build . --tag $DH_USERNAME/nadim:latest
-        docker build . --tag nadim:$VERSION
-        docker build . --tag nadim:latest
+        ${RUNNER} build . --tag $DH_USERNAME/nadim:$VERSION
+        ${RUNNER} build . --tag $DH_USERNAME/nadim:latest
+        ${RUNNER} build . --tag nadim:$VERSION
+        ${RUNNER} build . --tag nadim:latest
         ;;
     create)
         read -e -p "REPO URL: " REPO
@@ -51,22 +53,22 @@ function main() {
         history -s "$LOCAL_PORT"
         confirm "Do you want to use start script?"
         if [ "$?" = "1" ]; then
-          docker run -d --name $CONTAINER_NAME -p $LOCAL_PORT:$INTERNAL_PORT -e REPO=$REPO nadim:latest
+          ${RUNNER} run -d --name $CONTAINER_NAME -p $LOCAL_PORT:$INTERNAL_PORT -e REPO=$REPO nadim:latest
         else
           read -e -p "Node launcher (node, pm2, nodemon): " LAUNCHER
           history -s "$LAUNCHER"
           read -e -p "Main file path (path/to/index.js): " MAINFILE
           history -s "$MAINFILE"
-          docker run -d --name $CONTAINER_NAME \
+          ${RUNNER} run -d --name $CONTAINER_NAME \
               -p $LOCAL_PORT:$INTERNAL_PORT \
               -e REPO=$REPO -e MAINFILE=$MAINFILE -e LAUNCHER=$LAUNCHER nadim:latest
         fi
         ;;
     remove)
-        docker container rm -f $CONTAINER_NAME
+        ${RUNNER} container rm -f $CONTAINER_NAME
         ;;
     logs)
-        docker container logs -f $CONTAINER_NAME
+        ${RUNNER} container logs -f $CONTAINER_NAME
         ;;
     *)
         echo "Invalid command $CMD"

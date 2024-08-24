@@ -50,6 +50,6 @@ services:
             MAINFILE: "src/server.js"
             PORT: "5051"
         ports:
-            - "5000:5051" ## local:remote
+            - "6060:5051" ## local:remote
 
 ```

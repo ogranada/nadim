@@ -1,6 +1,6 @@
 #!/bin/bash
 
-command -v docker > /dev/null && RUNNER=docker || RUNNER=PODMAN
+command -v docker > /dev/null && RUNNER=docker || RUNNER=podman
 
 function confirm() {
   read -p "$@ " -n 1 -r
@@ -13,10 +13,15 @@ function confirm() {
   fi
 }
 
+function filter() {
+  echo "--- $1"
+}
+
 function main() {
   APP=$1
   CMD=$2
-  CONTAINER_NAME='naim_local'
+  IMAGE_NAME='nadim'
+  CONTAINER_NAME='nadim_local'
   DH_USERNAME='ogranada'
   case $CMD in
     usage)
@@ -34,15 +39,15 @@ function main() {
         ;;
     push)
         echo "Pushing image to docker registry"
-        ${RUNNER} image push --all-tags $DH_USERNAME/nadim
+        ${RUNNER} image push --all-tags $DH_USERNAME/$IMAGE_NAME
         ;;
     build)
         read -e -p "VERSION: " VERSION
         history -s "$VERSION"
-        ${RUNNER} build . --tag $DH_USERNAME/nadim:$VERSION
-        ${RUNNER} build . --tag $DH_USERNAME/nadim:latest
-        ${RUNNER} build . --tag nadim:$VERSION
-        ${RUNNER} build . --tag nadim:latest
+        ${RUNNER} build . --tag $DH_USERNAME/$IMAGE_NAME:$VERSION
+        ${RUNNER} build . --tag $DH_USERNAME/$IMAGE_NAME:latest
+        ${RUNNER} build . --tag $IMAGE_NAME:$VERSION
+        ${RUNNER} build . --tag $IMAGE_NAME:latest
         ;;
     create)
         read -e -p "REPO URL: " REPO
@@ -53,7 +58,7 @@ function main() {
         history -s "$LOCAL_PORT"
         confirm "Do you want to use start script?"
         if [ "$?" = "1" ]; then
-          ${RUNNER} run -d --name $CONTAINER_NAME -p $LOCAL_PORT:$INTERNAL_PORT -e REPO=$REPO nadim:latest
+          ${RUNNER} run -d --name $CONTAINER_NAME -p $LOCAL_PORT:$INTERNAL_PORT -e REPO=$REPO $IMAGE_NAME:latest
         else
           read -e -p "Node launcher (node, pm2, nodemon): " LAUNCHER
           history -s "$LAUNCHER"
@@ -61,7 +66,7 @@ function main() {
           history -s "$MAINFILE"
           ${RUNNER} run -d --name $CONTAINER_NAME \
               -p $LOCAL_PORT:$INTERNAL_PORT \
-              -e REPO=$REPO -e MAINFILE=$MAINFILE -e LAUNCHER=$LAUNCHER nadim:latest
+              -e REPO=$REPO -e MAINFILE=$MAINFILE -e LAUNCHER=$LAUNCHER $IMAGE_NAME:latest
         fi
         ;;
     remove)
@@ -69,6 +74,9 @@ function main() {
         ;;
     logs)
         ${RUNNER} container logs -f $CONTAINER_NAME
+        ;;
+    ls)
+        echo "$(command $RUNNER image ls | grep $IMAGE_NAME | grep latest)"
         ;;
     *)
         echo "Invalid command $CMD"

@@ -5,7 +5,7 @@ function current() {
 }
 
 git --version
-echo "NAIM - Node App IMage"
+echo "NADIM - Node App Docker IMage"
 echo "RUNNING AS: $(whoami)"
 echo "CURRENT FOLDER: $(pwd)"
 

@@ -18,21 +18,33 @@ export INTERNAL_PORT=5000
 export LOCAL_PORT=5050
 export REPO=https://github.com/ogranada-mentoring/dummy-be
 export MAINFILE=src/server.js
+```
+
+> Note: if the repo is private you can add an ssh private key using `SSH_KEY` env variable.
 
 # Using the `start` script
+```bash
 docker run -d --name sample -p $LOCAL_PORT:$INTERNAL_PORT -e REPO=$REPO nadim:latest
+```
 
 # Using node and running the specified file
+```bash
 docker run -d --name sample \
     -p $LOCAL_PORT:$INTERNAL_PORT \
     -e REPO=$REPO -e MAINFILE=$MAINFILE nadim:latest
+```
 
 # Using nodemon and running the specified file
+```bash
 docker run -d --name sample \
     -p $LOCAL_PORT:$INTERNAL_PORT \
-    -e REPO=$REPO -e MAINFILE=$MAINFILE -e LAUNCHER="nodemon" nadim:latest
+    -e REPO=$REPO \
+    -e MAINFILE=$MAINFILE \
+    -e LAUNCHER="nodemon" nadim:latest
+```
 
 # See the logs
+```bash
 docker container logs -f sample
 ```
 
@@ -46,9 +58,22 @@ services:
         stdin_open: true
         tty: true
         environment:
-            REPO: "https://github.com/ogranada-mentoring/dummy-be"
-            MAINFILE: "src/server.js"
-            PORT: "5051"
+            - REPO="https://github.com/ogranada-mentoring/dummy-be"
+            - MAINFILE="src/server.js"
+            - PORT="5051"
+            - MONITOR_PORT="8484"
+            - TOKENS="token1;token2;token3"
+            - |
+                SSH_KEY=
+                -----BEGIN OPENSSH PRIVATE KEY-----
+                bababababababababababacbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc10101010101
+                bababababababababababacbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc10101010101
+                bababababababababababacbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc10101010101
+                bababababababababababacbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc10101010101
+                bababababababababababacbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc10101010101
+                bababababababababababacbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc10101010101
+                bababababababababababacbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc
+                -----END OPENSSH PRIVATE KEY-----
         ports:
             - "6060:5051" ## local:remote
 

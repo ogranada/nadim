@@ -4,11 +4,6 @@ function current() {
   echo $(git branch | grep "*" | awk '{print $2}')
 }
 
-git --version
-echo "NADIM - Node App Docker IMage"
-echo "RUNNING AS: $(whoami)"
-echo "CURRENT FOLDER: $(pwd)"
-
 function prepare_project() {
   echo "Preparing project at $(pwd)"
   npm install
@@ -45,20 +40,52 @@ function run_project() {
   cd ..
 }
 
-if [ -z "$REPO" ]; then
-  echo "Repo not found..."
-else
-  echo "Preparing Repo $REPO..."
-  if [ -d "app" ]; then
-    cd app
-    prepare_project
-    cd ..
+function main() {
+  git --version
+  echo "NADIM - Node App Docker IMage"
+  echo "RUNNING AS: $(whoami)"
+  echo "CURRENT FOLDER: $(pwd)"
+
+  if [ -z "$REPO" ]; then
+    echo "Repo not found..."
   else
-    git clone $REPO app
-    cd app
-    prepare_project
-    cd ..
+    echo "Preparing Repo $REPO..."
+    if [ -d "app" ]; then
+      cd app
+      prepare_project
+      cd ..
+    else
+      git clone $REPO app
+      cd app
+      prepare_project
+      cd ..
+    fi
+    echo "Preparing execution..."
+    run_project
   fi
-  echo "Preparing execution..."
-  run_project
-fi
+}
+
+function prepare_ssh_keys() {
+  if [ -z "$SSH_KEY" ]; then
+    echo "No ssh key found..."
+  else
+    mkdir ~/.ssh || true
+    echo $SSH_KEY > ~/.ssh/id_rsa
+    chmod 600 ~/.ssh/*
+  fi
+}
+
+function run_restarter() {
+  npm install -g pm2
+  cd restarter
+  rm -Rf .env 2> /dev/null || true
+  echo "MONITOR_PORT=$1" >> .env
+  echo "TOKENS=$2" >> .env
+  npm i
+  npm run start &
+  cd ..
+}
+
+prepare_ssh_keys
+run_restarter "$MONITOR_PORT" "$TOKENS"
+main

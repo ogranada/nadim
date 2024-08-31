@@ -6,8 +6,21 @@ services:
         stdin_open: true
         tty: true
         environment:
-            REPO: "https://github.com/ogranada-mentoring/dummy-be"
-            MAINFILE: "src/server.js"
-            PORT: "5051"
+            - REPO="https://github.com/ogranada-mentoring/dummy-be"
+            - MAINFILE="src/server.js"
+            - PORT="5051"
+            - MONITOR_PORT="8484"
+            - TOKENS="token1;token2;token3"
+            - |
+                SSH_KEY=
+                -----BEGIN OPENSSH PRIVATE KEY-----
+                bababababababababababacbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc10101010101
+                bababababababababababacbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc10101010101
+                bababababababababababacbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc10101010101
+                bababababababababababacbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc10101010101
+                bababababababababababacbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc10101010101
+                bababababababababababacbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc10101010101
+                bababababababababababacbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc
+                -----END OPENSSH PRIVATE KEY-----
         ports:
             - "6060:5051" ## local:remote

@@ -39,7 +39,7 @@ function main() {
         ;;
     push)
         echo "Pushing image to docker registry"
-        ${RUNNER} image push --all-tags $DH_USERNAME/$IMAGE_NAME
+        ${RUNNER} image push $DH_USERNAME/$IMAGE_NAME
         ;;
     build)
         read -e -p "VERSION: " VERSION
